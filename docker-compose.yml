@@ -16,10 +16,10 @@ services:
       MYSQL_USER: my_user
       MYSQL_PASSWORD: my_password
 
-  MongoDB:
+  redis:
     build:
       context: .
-      dockerfile: Dockerfile_mongodb
+      dockerfile: Dockerfile_redis
 
   nginx:
     image: nginx:latest
