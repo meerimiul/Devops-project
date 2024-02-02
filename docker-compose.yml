@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  apache:
+    build:
+      context: .
+      dockerfile: Dockerfile_apache_php
+
+  mysql:
+    build:
+      context: .
+      dockerfile: Dockerfile_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: my_database
+      MYSQL_USER: my_user
+      MYSQL_PASSWORD: my_password
+
+  MongoDB:
+    build:
+      context: .
+      dockerfile: Dockerfile_mongodb
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "8080:80"
+    depends_on:
+      - apache
+
