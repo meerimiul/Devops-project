@@ -1,14 +1,38 @@
 name: CI/CD Pipeline
 
 on:
- push:
-    branches: [ main ]
- pull_request:
-    branches: [ main ]
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
- build:
+  build:
     runs-on: ubuntu-latest
+
+    services:
+      apache:
+        image: your-apache-image:latest
+        volumes:
+          - ./test.php:/var/www/html/test.php
+      mysql:
+        image: your-mysql-image:latest
+        env:
+          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_DATABASE: my_database
+          MYSQL_USER: my_user
+          MYSQL_PASSWORD: my_password
+      redis:
+        image: your-redis-image:latest
+      nginx:
+        image: nginx:latest
+        volumes:
+          - ./nginx.conf:/etc/nginx/nginx.conf
+        ports:
+          - "8080:80"
+        depends_on:
+          - apache
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -18,9 +42,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: user/app:latest
+          tags: your-dockerhub-username/your-app:latest
 
- test:
+  test:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -28,7 +52,7 @@ jobs:
         run: |
           echo "Run your tests here"
 
- deploy_staging:
+  deploy_staging:
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -36,7 +60,7 @@ jobs:
         run: |
           echo "Deploy your application to staging here"
 
- approve:
+  approve:
     needs: deploy_staging
     runs-on: ubuntu-latest
     steps:
@@ -45,9 +69,9 @@ jobs:
         with:
           script: |
             const issueComment = context.issue({ body: 'Test the changes before pushing to production.' })
-            const newIssue = await github.issues.createComment(issueComment)
+            await github.issues.createComment(issueComment)
 
- deploy_production:
+  deploy_production:
     needs: approve
     runs-on: ubuntu-latest
     steps:
