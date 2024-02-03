@@ -5,7 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile_apache_php
-
+    volumes:
+      - ./test.php:/var/www/html/test.php
   mysql:
     build:
       context: .
