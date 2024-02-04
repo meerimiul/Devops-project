@@ -16,6 +16,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Install Docker on Amazon Linux
+        run: |
+          sudo amazon-linux-extras install docker
+          sudo service docker start
+          sudo usermod -a -G docker ec2-user
+          sudo chkconfig docker on
+
       - name: Build and Push Apache Docker Image
         run: |
           docker build -t meerim89/devops-project-apache:latest -f Dockerfile_php_apache .
@@ -48,7 +55,8 @@ jobs:
     steps:
       - name: Deploy to Testing
         run: |
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ec2-user@your-testing-ec2-ip 'bash -s' << 'ENDSSH'
+          chmod 400 path/to/your/private-key.pem
+          ssh -i path/to/your/private-key.pem ec2-user@your-testing-ec2-ip 'bash -s' << 'ENDSSH'
           docker-compose -f docker-compose.testing.yml pull
           docker-compose -f docker-compose.testing.yml up -d
           ENDSSH
@@ -61,7 +69,8 @@ jobs:
     steps:
       - name: Deploy to Staging
         run: |
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ec2-user@your-staging-ec2-ip 'bash -s' << 'ENDSSH'
+          chmod 400 path/to/your/private-key.pem
+          ssh -i path/to/your/private-key.pem ec2-user@your-staging-ec2-ip 'bash -s' << 'ENDSSH'
           docker-compose -f docker-compose.staging.yml pull
           docker-compose -f docker-compose.staging.yml up -d
           ENDSSH
@@ -74,7 +83,8 @@ jobs:
     steps:
       - name: Deploy to Pre-Production
         run: |
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ec2-user@your-pre-production-ec2-ip 'bash -s' << 'ENDSSH'
+          chmod 400 path/to/your/private-key.pem
+          ssh -i path/to/your/private-key.pem ec2-user@your-pre-production-ec2-ip 'bash -s' << 'ENDSSH'
           docker-compose -f docker-compose.pre-production.yml pull
           docker-compose -f docker-compose.pre-production.yml up -d
           ENDSSH
