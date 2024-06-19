@@ -1,3 +1,7 @@
+name: Python package
+
+on: [push]
+
 image: docker
 
 sevices:
